@@ -7,7 +7,7 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     preDeployCommand: python manage.py migrate --noinput
-    startCommand: daphne -b 0.0.0.0 -p $PORT config.asgi:application
+    dockerCommand: daphne -b 0.0.0.0 -p $PORT config.asgi:application
     healthCheckPath: /api/vivant/
     envVars:
       - key: DJANGO_DEBUG
@@ -72,7 +72,7 @@ services:
     plan: starter
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    startCommand: celery -A config worker -l info --concurrency 2
+    dockerCommand: celery -A config worker -l info --concurrency 2
     envVars:
       - key: DJANGO_DEBUG
         value: "0"
@@ -181,7 +181,7 @@ services:
     plan: starter
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    startCommand: celery -A config beat -l info
+    dockerCommand: celery -A config beat -l info
     envVars:
       - key: DJANGO_DEBUG
         value: "0"
