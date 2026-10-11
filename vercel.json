@@ -6,27 +6,27 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://bakhita-api.onrender.com/api/$1"
+      "destination": "https://bakhita-api-production.up.railway.app/api/$1"
     },
     {
       "source": "/p/(.*)",
-      "destination": "https://bakhita-api.onrender.com/p/$1"
+      "destination": "https://bakhita-api-production.up.railway.app/p/$1"
     },
     {
       "source": "/profil-partage/(.*)",
-      "destination": "https://bakhita-api.onrender.com/profil-partage/$1"
+      "destination": "https://bakhita-api-production.up.railway.app/profil-partage/$1"
     },
     {
       "source": "/gestion-bakhita-x7/(.*)",
-      "destination": "https://bakhita-api.onrender.com/gestion-bakhita-x7/$1"
+      "destination": "https://bakhita-api-production.up.railway.app/gestion-bakhita-x7/$1"
     },
     {
       "source": "/gestion-bakhita-x7",
-      "destination": "https://bakhita-api.onrender.com/gestion-bakhita-x7"
+      "destination": "https://bakhita-api-production.up.railway.app/gestion-bakhita-x7"
     },
     {
       "source": "/static/(.*)",
-      "destination": "https://bakhita-api.onrender.com/static/$1"
+      "destination": "https://bakhita-api-production.up.railway.app/static/$1"
     },
     {
       "source": "/(.*)",
