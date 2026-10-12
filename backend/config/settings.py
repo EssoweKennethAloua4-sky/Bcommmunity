@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     # Daphne doit etre en premiere position pour les WebSockets ASGI
     "daphne",
     "unfold",
+    "cloudinary_storage",
+    "cloudinary",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -161,38 +163,43 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 SITE_URL = env("SITE_URL", "http://localhost:5173")
 
-# --- Stockage des media : Cloudflare R2 en production, disque local en dev ---
-R2_BUCKET = env("R2_BUCKET", "")
-if R2_BUCKET:
-    R2_DOMAINE = env("R2_PUBLIC_DOMAIN", requis=True)
+# --- Stockage des media : Cloudinary si configure, disque local sinon ---
+CLOUDINARY_CLOUD_NAME = env("CLOUDINARY_CLOUD_NAME", "")
+CLOUDINARY_API_KEY = env("CLOUDINARY_API_KEY", "")
+CLOUDINARY_API_SECRET = env("CLOUDINARY_API_SECRET", "")
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": CLOUDINARY_CLOUD_NAME,
+    "API_KEY": CLOUDINARY_API_KEY,
+    "API_SECRET": CLOUDINARY_API_SECRET,
+}
+
+if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
+    import cloudinary
+    cloudinary.config(
+        cloud_name=CLOUDINARY_CLOUD_NAME,
+        api_key=CLOUDINARY_API_KEY,
+        api_secret=CLOUDINARY_API_SECRET,
+        secure=True,
+    )
     STORAGES = {
         "default": {
-            "BACKEND": "storages.backends.s3.S3Storage",
-            "OPTIONS": {
-                "bucket_name": R2_BUCKET,
-                "endpoint_url": f"https://{env('R2_ACCOUNT_ID', requis=True)}.r2.cloudflarestorage.com",
-                "access_key": env("R2_ACCESS_KEY_ID", requis=True),
-                "secret_key": env("R2_SECRET_ACCESS_KEY", requis=True),
-                "region_name": "auto",
-                "signature_version": "s3v4",
-                "custom_domain": R2_DOMAINE,
-                "querystring_auth": False,
-                "file_overwrite": False,
-                "default_acl": None,
-                # Les noms de fichiers sont des UUID : cache immutable d'un an
-                "object_parameters": {"CacheControl": "public, max-age=31536000, immutable"},
-            },
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
-        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
     }
-    MEDIA_URL = f"https://{R2_DOMAINE}/"
+    MEDIA_URL = f"https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/"
     MEDIA_ROOT = BASE_DIR / "media"
 else:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
     STORAGES = {
         "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
     }
 
 # Securite

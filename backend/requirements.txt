@@ -113,3 +113,5 @@ pywebpush
 firebase-admin
 
 django-unfold==0.108.0
+cloudinary
+django-cloudinary-storage
