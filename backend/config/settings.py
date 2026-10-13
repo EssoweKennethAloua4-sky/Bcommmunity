@@ -161,6 +161,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+WHITENOISE_SKIP_COMPRESS_EXTENSIONS = (
+    "eot", "font", "otf", "svg", "ttf", "woff", "woff2",
+    "js", "css",
+)
 SITE_URL = env("SITE_URL", "http://localhost:5173")
 
 # --- Stockage des media : Cloudinary si configure, disque local sinon ---
@@ -174,33 +178,41 @@ CLOUDINARY_STORAGE = {
     "API_SECRET": CLOUDINARY_API_SECRET,
 }
 
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
     import cloudinary
+
     cloudinary.config(
         cloud_name=CLOUDINARY_CLOUD_NAME,
         api_key=CLOUDINARY_API_KEY,
         api_secret=CLOUDINARY_API_SECRET,
         secure=True,
     )
+
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
+
     MEDIA_URL = f"https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/"
     MEDIA_ROOT = BASE_DIR / "media"
 else:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
+
     STORAGES = {
-        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
+
 
 # Securite
 X_FRAME_OPTIONS = "DENY"
