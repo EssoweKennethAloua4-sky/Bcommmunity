@@ -10,7 +10,7 @@ RUN mkdir -p /app/media && chown app:app /app/media
 RUN DJANGO_SECRET_KEY=build-only-secret-key-not-for-production \
     DATABASE_URL=postgresql://build:build@127.0.0.1/build \
     ALLOWED_HOSTS=localhost \
-        python manage.py collectstatic --noinput \
+        python manage.py collectstatic --noinput --upload-unhashed-files \
     && chown -R app:app /app/staticfiles
 USER app
 EXPOSE 8000
